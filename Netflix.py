@@ -1,26 +1,43 @@
+import json
+
+
 #----------------
 # netflix_predict
 #----------------
-def netflix_predict(c_id,m_id):
+def netflix_predict(m_id,c_id):
   '''
   c_id - customer id
   m_id - movie id
   '''
   
   
-  return 0
+  return 3
 #-------------
 # netflix_rsme
 #-------------
 
-def netflix_rmse(p,a):
+def netflix_rmse(p):
   '''
   p - iterable of preictions for ratings
-  a - iterable of actual ratings
   '''
   
-  return 0
+  '''
+  Make the necessary lists from the probe data
+  '''
+  probe_data = open('cct667-ProbeCacheAnswers.txt', 'r')
+  probe_dict = {}
+  for line in probe_data:
+    s = line.strip().split()
+    #associate [movieID,customerID] with rating
+    probe_dict[s[0],s[1]] = eval(s[2])
+
   
+  sum = 0
+  for key in p:
+    sum += (p[key] - probe_dict[key])**2
+  
+  
+  return sum/len(p)
 #-------------
 # netflix_read
 #-------------
@@ -50,22 +67,34 @@ def netflix_solve(r, w):
   w a writer
   '''
  
+  prediction_dict = {}
+  
+  c_id = 0
+  m_id = 0
+  
   while True:
+  
     s = r.readline().strip()
-    
-    m_id = 0
     
     if len(s) == 0:
        break 
-    
+    #check to see if line is movie ID 
     if (':' in s):
-      m_id = s
+      m_id = s[:-1]
+      w.write(str(m_id) + ': \n')
+      continue
     else:
       c_id = s
     
-    p = netflix_predict(c_id, m_id)
+    p = netflix_predict(m_id, c_id)
+   
+    prediction_dict[m_id,c_id] = p 
     
-    w.write(str(p) + '\n')   
+    w.write(str(p) + '\n')
+    
+  
+  rmse = netflix_rmse(prediction_dict)
+  w.write(str(rmse))  
     
     
       
