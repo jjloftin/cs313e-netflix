@@ -9,9 +9,11 @@ def netflix_predict(m_id,c_id):
   c_id - customer id
   m_id - movie id
   '''
+  base = 3.7
   
   
-  return 3
+  
+  return 3.65
 #-------------
 # netflix_rsme
 #-------------
@@ -32,12 +34,15 @@ def netflix_rmse(p):
     probe_dict[s[0],s[1]] = eval(s[2])
 
   
+  '''
+  Calulate and return the RMSE
+  '''
   sum = 0
   for key in p:
     sum += (p[key] - probe_dict[key])**2
   
   
-  return sum/len(p)
+  return (sum/len(p))**0.5
 #-------------
 # netflix_read
 #-------------
