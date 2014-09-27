@@ -1,0 +1,17 @@
+.......TestNetflix.py:77: ResourceWarning: unclosed file <_io.TextIOWrapper name='/u/prat0318/netflix-tests/sp35972-MovieAvg.txt' mode='r' encoding='UTF-8'>
+  netflix_solve(r, w)
+.TestNetflix.py:83: ResourceWarning: unclosed file <_io.TextIOWrapper name='/u/prat0318/netflix-tests/sp35972-MovieAvg.txt' mode='r' encoding='UTF-8'>
+  netflix_solve(r, w)
+.TestNetflix.py:89: ResourceWarning: unclosed file <_io.TextIOWrapper name='/u/prat0318/netflix-tests/sp35972-MovieAvg.txt' mode='r' encoding='UTF-8'>
+  netflix_solve(r, w)
+.
+----------------------------------------------------------------------
+Ran 10 tests in 55.099s
+
+OK
+Name          Stmts   Miss Branch BrMiss  Cover   Missing
+---------------------------------------------------------
+Netflix          51      1     16      1    97%   29
+TestNetflix      47      0      0      0   100%   
+---------------------------------------------------------
+TOTAL            98      1     16      1    98%   
