@@ -13,7 +13,7 @@
 from io       import StringIO
 from unittest import main, TestCase
 
-from Netflix import netflix_predict, netflix_print, netflix_solve, netflix_RMSE
+from Netflix import netflix_predict, netflix_solve, netflix_rmse
 
 
 # -----------
@@ -22,77 +22,73 @@ from Netflix import netflix_predict, netflix_print, netflix_solve, netflix_RMSE
 
 class Testnetflix (TestCase) :
 
-    # ----
+    # -------
     # predict
-    # ----
+    # -------
 
     def test_predict_1 (self) :
-        v = netflix_predict(2043, 1417435)
-        self.assertEqual(v, 3)
+      p = netflix_predict(2043, 1417435)
+      assert 1 <= p <= 5
 
     def test_predict_2 (self) :
-        v = netflix_predict(10851, 1417435)
-        self.assertEqual(, 125)
+      p = netflix_predict(10851, 1417435)
+      assert 1 <= p <= 5
 
     def test_predict_3 (self) :
-        v = netflix_predict(2043, 462685)
-        self.assertEqual(v, 89)
+      p = netflix_predict(2043, 462685)
+      assert 1 <= p <= 5
 
     def test_predict_4 (self) :
-        v = netflix_predict(10851, 462685)
-        self.assertEqual(v, 174)
+      p = netflix_predict(10851, 462685)
+      assert 1 <= p <= 5
 
-    # -----
-    # print
-    # -----
+    # ----
+    # rmse
+    # ----
+    
+    def test_rmse_1(self) :
+      a = {0:0, 1:0, 2:0}
+      p = {0:0, 1:0, 2:0}
+      v = netflix_rmse(a,p)
+      
+      self.assertEqual(v, 0)
+    
+    def test_rmse_2(self):
+      a = {0:0, 1:0, 2:0}
+      p = {0:2, 1:2, 2:2}
+      v = netflix_rmse(a,p)
+      
+      self.assertEqual(v, 2)
+      
+    def test_rmse_3(self):
+      a = {0:0, 1:0, 2:0}
+      p = {0:1, 1:2, 2:3}
+      v = netflix_rmse(a,p)
+     
+      assert 2.1 < v < 2.2    
 
-    def test_print_1 (self) :
-        w = StringIO()
-        netflix_print(w, 1, 10, netflix_predict(1, 10))
-        self.assertEqual(w.getvalue(), "1 10 20\n")
-
-    def test_print_2 (self) :
-       w = StringIO()
-       netflix_print(w, 100, 200, netflix_predict(100, 200))
-       self.assertEqual(w.getvalue(), "100 200 125\n")
-       
-    def test_print_3 (self) :
-       w = StringIO()
-       netflix_print(w, 201, 210, netflix_predict(201, 210))
-       self.assertEqual(w.getvalue(), "201 210 89\n")
-       
-    def test_print_4 (self) :
-      w = StringIO()
-      netflix_print(w, 900, 1000, netflix_predict(900, 1000))
-      self.assertEqual(w.getvalue(), "900 1000 174\n")
     # -----
     # solve
     # -----
-
+    
     def test_solve_1 (self) :
-        r = StringIO("2048: \n 1417435 \n 2312054 \n 462685")
-        w = StringIO()
-        netflix_solve(r, w)
-        self.assertEqual(w.getvalue(), "2048: \n 3 3 3")
+      r = StringIO('10: \n 1952305 \n 1531863 \n')
+      w = StringIO()
+      netflix_solve(r, w)
+      self.assertEqual(w.getvalue().count(':'), 2 )
     
-    def test_solve_2 (self) :
-       r = StringIO("")
-       w = StringIO()
-       netflix_solve(r, w)
-       self.assertEqual(w.getvalue(), '')
-       
-     def test_solve_3 (self) :
-        r = StringIO("2048: \n 1417435 \n 2312054 \n 462685 \n 10851: \n 1417435")
-        w = StringIO()
-        netflix_solve(r, w)
-        self.assertEqual(w.getvalue(), "2048: \n 3 \n 3 \n 3 \n 1045: \n 3 \n")
-    
-    def test_solve_4 (self) :
-       r = StringIO("2048: \n ")
-       w = StringIO()
-       netflix_solve(r, w)
-       self.assertEqual(w.getvalue(), '')
-       
+    def test_solve_2(self) :
+      r = StringIO('10006: \n 1093333 \n 1982605 \n 1534853 \n 1632583')
+      w = StringIO()
+      netflix_solve(r, w)
+      self.assertEqual(w.getvalue().count(':'), 2 )
+      
+    def test_solve_3(self) : 
+      r = StringIO('10007: \n 1204847 \n 10006: \n 1093333 \n 10: \n 1952305')
+      w = StringIO()
+      netflix_solve(r, w)
+      self.assertEqual(w.getvalue().count(':'), 4 )     
+  
 # ----
 # main
 # ----

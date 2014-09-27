@@ -14,56 +14,45 @@ def netflix_predict(m_avg, c_avg):
   '''
   Give a base rating. Calculate difference of movie and customer averages from the base. Weight them and add to base rating.
   '''
-  base = 3.6
+  
+
+  base = 3.65
+  
   m_diff = m_avg - base
   c_diff = c_avg - base
-  
+
   p = base + 0.7*m_diff + 0.3*c_diff
- 
+  
+  if(p > 5):
+    return 5
+  elif(p < 1):
+    return 1
   
   return p
 #-------------
 # netflix_rsme
 #-------------
 
-def netflix_rmse(p):
+def netflix_rmse(p,a):
   '''
   p - iterable of preictions for ratings
   '''
   
-  '''
-  Make the necessary lists from the probe data
-  '''
-  probe_data = open('cct667-ProbeCacheAnswers.txt', 'r')
-  probe_dict = {}
-  for line in probe_data:
-    s = line.strip().split()
-    #associate [movieID,customerID] with rating
-    probe_dict[s[0],s[1]] = eval(s[2])
 
-  
-  probe_data.close()
   '''
   Calulate and return the RMSE
   '''
+  
+  assert len(p) <= len(a)
+  
   sum = 0
   for key in p:
-    sum += (p[key] - probe_dict[key])**2
+    sum += (p[key] - a[key])**2
   
+  assert sum >= 0
   
   return (sum/len(p))**0.5
 
-#-------------
-# netlix_print
-#-------------
-def netflix_print(w, pc):
-   '''
-   w - writer
-   p - prediction or customer id
-   write prediction to writer
-   '''
-   
-   w.write(str(pc) + '\n')
 
 #--------------
 # netflix_solve
@@ -75,11 +64,11 @@ def netflix_solve(r, w):
   r a reader
   w a writer
   '''
- 
-  c_avgs = open('zwf69-TCustRatings.txt','r') 
-  c_avg_dict = {}
   
-  i = 0
+  #create dictionary of average customer ratings. dict[CustomerID] = average rating for customer ID
+  c_avgs = open('/u/prat0318/netflix-tests/zwf69-TCustRatings.txt','r') 
+  c_avg_dict = {}
+
   
   for line in c_avgs:
     s = line.strip().split(',')
@@ -87,25 +76,26 @@ def netflix_solve(r, w):
 
   c_avgs.close()
    
-  m_avgs = open('sp35972-MovieAvg.txt','r')
+  #create dictionary of average movie ratings. dict[MovieID] = average rating for movie ID
+  m_avgs = open('/u/prat0318/netflix-tests/sp35972-MovieAvg.txt','r')
   m_avg_dict = {}
   
   for line in m_avgs:
     s = line.strip().split(':')
     m_avg_dict[s[0]] = eval(s[1])
   
-  
+  #initiailize dictionary of movie rating predictions. dict[MovieID,CustomerID] = predicted rating of Movie ID for Customer ID
   prediction_dict = {}
   
   c_id = 0
   m_id = 0
   
-  while True:
+  #Place predictions in prediction dict and write MovieID's and predictions to writer 
   
-    s = r.readline().strip()
-    
-    if len(s) == 0:
-       break 
+  for line in r:
+  
+    s = line.strip()
+ 
     #check to see if line is movie ID 
     if (':' in s):
       m_id = s[:-1]
@@ -114,18 +104,27 @@ def netflix_solve(r, w):
     else:
       c_id = s
     
+    
+    
     p = netflix_predict(m_avg_dict[m_id], c_avg_dict[c_id])
-   
-    prediction_dict[m_id,c_id] = p 
     
     w.write(str(p) + '\n')
     
-  
-  rmse = int(netflix_rmse(prediction_dict) * 100) / 100
-  w.write(str(rmse))  
+    
+    prediction_dict[m_id,c_id] = p 
     
     
-      
   
+  #Make dictonary of actual ratings dict[movieID, customerID] = actual rating
+  probe_data = open('/u/prat0318/netflix-tests/cct667-ProbeCacheAnswers.txt', 'r')
+  probe_dict = {}
+  for line in probe_data:
+    s = line.strip().split()
+    #associate [movieID,customerID] with rating
+    probe_dict[s[0],s[1]] = eval(s[2])
+
   
+  probe_data.close()
   
+  rmse = int(netflix_rmse(prediction_dict, probe_dict) * 100) / 100
+  w.write('RMSE: ' + str(rmse))  
